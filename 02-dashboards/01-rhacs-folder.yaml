@@ -1,0 +1,11 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaFolder
+metadata:
+  name: rhacs-folder
+spec:
+  allowCrossNamespaceImport: false
+  resyncPeriod: 10m0s
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  title: RHACS Dashbords

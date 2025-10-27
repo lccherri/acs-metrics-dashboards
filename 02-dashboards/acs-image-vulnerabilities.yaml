@@ -1,0 +1,964 @@
+kind: GrafanaDashboard
+apiVersion: grafana.integreatly.org/v1beta1
+metadata:
+  name: acs-image-vulnerabilities
+spec:
+  folderRef: rhacs-folder
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  json: |
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": {
+              "type": "grafana",
+              "uid": "-- Grafana --"
+            },
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+          }
+        ]
+      },
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 0,
+      "id": 3,
+      "links": [],
+      "panels": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "fieldMinMax": false,
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  }
+                ]
+              }
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "CRITICAL_VULNERABILITY_SEVERITY"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "red",
+                      "mode": "fixed"
+                    }
+                  },
+                  {
+                    "id": "displayName",
+                    "value": "CRITICAL"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "IMPORTANT_VULNERABILITY_SEVERITY"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "orange",
+                      "mode": "fixed"
+                    }
+                  },
+                  {
+                    "id": "displayName",
+                    "value": "IMPORTANT"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "LOW_VULNERABILITY_SEVERITY"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "blue",
+                      "mode": "fixed"
+                    }
+                  },
+                  {
+                    "id": "displayName",
+                    "value": "LOW"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "MODERATE_VULNERABILITY_SEVERITY"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "yellow",
+                      "mode": "fixed"
+                    }
+                  },
+                  {
+                    "id": "displayName",
+                    "value": "MODERATE"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "UNKNOWN_VULNERABILITY_SEVERITY"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "super-light-blue",
+                      "mode": "fixed"
+                    }
+                  },
+                  {
+                    "id": "displayName",
+                    "value": "UNKNOWN"
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 24,
+            "x": 0,
+            "y": 0
+          },
+          "id": 3,
+          "options": {
+            "displayMode": "basic",
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "maxVizHeight": 300,
+            "minVizHeight": 16,
+            "minVizWidth": 8,
+            "namePlacement": "auto",
+            "orientation": "vertical",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showUnfilled": true,
+            "sizing": "auto",
+            "valueMode": "color"
+          },
+          "pluginVersion": "12.1.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "exemplar": false,
+              "expr": "count by (severity) (\r\n  group by (severity, cve) (\r\n    (\r\n      (\r\n        acs_vulnerable_image_info{severity=~\"$severity\"}\r\n        AND ON (cve)\r\n        acs_vulnerable_image_component_info{ is_fixable=~\"$fixable\"}\r\n      )\r\n      AND ON(image_hash)\r\n      acs_vulnerable_deployment_info{secured_cluster_name=~\"$cluster\"}\r\n    )\r\n  )\r\n)",
+              "format": "time_series",
+              "instant": true,
+              "legendFormat": "__auto",
+              "range": false,
+              "refId": "A"
+            }
+          ],
+          "title": "",
+          "transformations": [
+            {
+              "id": "joinByField",
+              "options": {
+                "byField": "Time",
+                "mode": "outer"
+              }
+            },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {},
+                "includeByName": {},
+                "indexByName": {
+                  "CRITICAL_VULNERABILITY_SEVERITY": 1,
+                  "IMPORTANT_VULNERABILITY_SEVERITY": 2,
+                  "LOW_VULNERABILITY_SEVERITY": 4,
+                  "MODERATE_VULNERABILITY_SEVERITY": 3,
+                  "Time": 0,
+                  "UNKNOWN_VULNERABILITY_SEVERITY": 5
+                },
+                "renameByName": {
+                  "IMPORTANT_VULNERABILITY_SEVERITY": ""
+                }
+              }
+            }
+          ],
+          "type": "bargauge"
+        },
+        {
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 6
+          },
+          "id": 4,
+          "panels": [],
+          "title": "Image CVEs",
+          "type": "row"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "align": "auto",
+                "cellOptions": {
+                  "type": "auto"
+                },
+                "filterable": false,
+                "inspect": false
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "CRITICAL_VULNERABILITY_SEVERITY": {
+                      "color": "red",
+                      "index": 0,
+                      "text": "CRITICAL"
+                    },
+                    "IMPORTANT_VULNERABILITY_SEVERITY": {
+                      "color": "orange",
+                      "index": 1,
+                      "text": "IMPORTANT"
+                    },
+                    "LOW_VULNERABILITY_SEVERITY": {
+                      "color": "blue",
+                      "index": 3,
+                      "text": "LOW"
+                    },
+                    "MODERATE_VULNERABILITY_SEVERITY": {
+                      "color": "yellow",
+                      "index": 2,
+                      "text": "MODERATE"
+                    },
+                    "UNKNOWN_VULNERABILITY_SEVERITY": {
+                      "color": "super-light-blue",
+                      "index": 4,
+                      "text": "UNKNOWN"
+                    },
+                    "false": {
+                      "index": 6,
+                      "text": "NO"
+                    },
+                    "true": {
+                      "index": 5,
+                      "text": "YES"
+                    }
+                  },
+                  "type": "value"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Score Version"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 130
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "CVSS"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 180
+                  },
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "mode": "lcd",
+                      "type": "gauge",
+                      "valueDisplayMode": "text"
+                    }
+                  },
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "continuous-YlRd"
+                    }
+                  },
+                  {
+                    "id": "max",
+                    "value": 10
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Impact Score"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 180
+                  },
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "mode": "lcd",
+                      "type": "gauge",
+                      "valueDisplayMode": "text"
+                    }
+                  },
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "continuous-YlRd"
+                    }
+                  },
+                  {
+                    "id": "max",
+                    "value": 10
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Env Score"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 180
+                  },
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "mode": "lcd",
+                      "type": "gauge",
+                      "valueDisplayMode": "text"
+                    }
+                  },
+                  {
+                    "id": "max",
+                    "value": 1
+                  },
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "continuous-YlRd"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "CVE"
+                },
+                "properties": [
+                  {
+                    "id": "custom.filterable",
+                    "value": true
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Severity"
+                },
+                "properties": [
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "type": "color-text"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Is Fixable"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 120
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Is Suppressed"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 120
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Affected Images"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 150
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Affected Workload"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 150
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 13,
+            "w": 24,
+            "x": 0,
+            "y": 7
+          },
+          "id": 2,
+          "options": {
+            "cellHeight": "sm",
+            "footer": {
+              "countRows": false,
+              "enablePagination": true,
+              "fields": "",
+              "reducer": [
+                "sum"
+              ],
+              "show": false
+            },
+            "showHeader": true,
+            "sortBy": [
+              {
+                "desc": true,
+                "displayName": "CVSS"
+              }
+            ]
+          },
+          "pluginVersion": "12.1.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "exemplar": false,
+              "expr": "acs_image_vulnerability_info{}\r\nAND on (cve)\r\n(\r\n    acs_vulnerable_image_info{severity=~\"$severity\"}\r\n    AND ON (cve, image_hash)\r\n    (\r\n        acs_vulnerable_image_component_info{is_fixable=~\"$fixable\"}\r\n        AND ON (image_hash)\r\n        acs_vulnerable_deployment_info{secured_cluster_name=~\"$cluster\", is_platform_component=~\"$platform_component\"}\r\n    )\r\n)",
+              "format": "table",
+              "hide": false,
+              "instant": true,
+              "legendFormat": "__auto",
+              "range": false,
+              "refId": "G"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "exemplar": false,
+              "expr": "group by (cve, severity) (\r\n  (\r\n    acs_vulnerable_image_info{severity=~\"$severity\"}\r\n    AND ON (cve)\r\n    acs_vulnerable_image_component_info{is_fixable=~\"$fixable\"}\r\n  )\r\n  AND ON(image_hash)\r\n  acs_vulnerable_deployment_info{secured_cluster_name=~\"$cluster\", is_platform_component=~\"$platform_component\"}\r\n)",
+              "format": "table",
+              "hide": false,
+              "instant": true,
+              "legendFormat": "__auto",
+              "range": false,
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "exemplar": false,
+              "expr": "acs_vulnerability_cvss{scope=\"$scope\"}\r\nAND ON(cve)\r\n(\r\n    acs_vulnerable_image_info{severity=~\"$severity\"}\r\n    AND ON (cve, image_hash)\r\n    (\r\n        acs_vulnerable_image_component_info{is_fixable=~\"$fixable\"}\r\n        AND ON (image_hash)\r\n        acs_vulnerable_deployment_info{secured_cluster_name=~\"$cluster\", is_platform_component=~\"$platform_component\"}\r\n    )\r\n)",
+              "format": "table",
+              "hide": false,
+              "instant": true,
+              "legendFormat": "__auto",
+              "range": false,
+              "refId": "B"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "exemplar": false,
+              "expr": "group by (cve, is_fixable) (\r\n  acs_vulnerable_image_component_info{is_fixable=~\"$fixable\"}\r\n  AND ON(cve, image_hash)\r\n  (\r\n    acs_vulnerable_image_info{severity=~\"$severity\"}\r\n    AND ON (image_hash)\r\n    acs_vulnerable_deployment_info{secured_cluster_name=~\"$cluster\", is_platform_component=~\"$platform_component\"}\r\n  )\r\n)",
+              "format": "table",
+              "hide": false,
+              "instant": true,
+              "legendFormat": "__auto",
+              "range": false,
+              "refId": "H"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "exemplar": false,
+              "expr": "acs_vulnerability_impact_score{scope=\"$scope\"}\r\n  AND ON(cve)\r\nacs_vulnerable_deployment_info{secured_cluster_name=~\"$cluster\", is_platform_component=~\"$plarform_component\"}\r\n  AND ON(cve)\r\nacs_image_vulnerability_info{severity=~\"$severity\", is_fixable=~\"$fixable\"}",
+              "format": "table",
+              "hide": true,
+              "instant": true,
+              "legendFormat": "__auto",
+              "range": false,
+              "refId": "C"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "exemplar": false,
+              "expr": "acs_vulnerability_env_impact{scope=\"$scope\"}\r\n  AND ON(cve)\r\nacs_vulnerable_deployment_info{secured_cluster_name=~\"$cluster\", is_platform_component=~\"$plarform_component\"}\r\n  AND ON(cve)\r\nacs_image_vulnerability_info{severity=~\"$severity\", is_fixable=~\"$fixable\"}",
+              "format": "table",
+              "hide": true,
+              "instant": true,
+              "legendFormat": "__auto",
+              "range": false,
+              "refId": "D"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "exemplar": false,
+              "expr": "count by (cve) (\r\n  group by (cve, image_hash) (\r\n    acs_vulnerable_image_info{severity=~\"$severity\"}\r\n    AND ON (cve, image_hash)\r\n    (\r\n      acs_vulnerable_image_component_info{is_fixable=~\"$fixable\"}\r\n      AND ON (image_hash)\r\n      acs_vulnerable_deployment_info{secured_cluster_name=~\"$cluster\", is_platform_component=~\"$platform_component\"}\r\n    )\r\n  )\r\n)",
+              "format": "table",
+              "hide": false,
+              "instant": true,
+              "legendFormat": "__auto",
+              "range": false,
+              "refId": "E"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${datasource}"
+              },
+              "editorMode": "code",
+              "exemplar": false,
+              "expr": "count by (cve) (\r\n  group by (cve, image_hash) (\r\n    acs_vulnerable_image_info{severity=~\"$severity\"}\r\n    AND ON (cve, image_hash)\r\n    (\r\n      acs_vulnerable_image_component_info{is_fixable=~\"$fixable\"}\r\n      AND ON (image_hash)\r\n      acs_vulnerable_deployment_info{secured_cluster_name=~\"$cluster\", is_platform_component=~\"$platform_component\"}\r\n    )\r\n  )\r\n)\r\n\r\n",
+              "format": "table",
+              "hide": false,
+              "instant": true,
+              "legendFormat": "__auto",
+              "range": false,
+              "refId": "F"
+            }
+          ],
+          "title": "",
+          "transformations": [
+            {
+              "id": "joinByField",
+              "options": {
+                "byField": "cve",
+                "mode": "outerTabular"
+              }
+            },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {
+                  "Time": true,
+                  "Time 1": true,
+                  "Time 2": true,
+                  "Time 3": true,
+                  "Time 4": true,
+                  "Time 5": true,
+                  "Value": true,
+                  "Value #A": true,
+                  "Value #B": false,
+                  "Value #G": true,
+                  "Value #H": true,
+                  "__name__": true,
+                  "__name__ 1": true,
+                  "__name__ 2": true,
+                  "__name__ 3": true,
+                  "__name__ 4": true,
+                  "container": true,
+                  "container 1": true,
+                  "container 2": true,
+                  "container 3": true,
+                  "container 4": true,
+                  "cve_link": true,
+                  "endpoint": true,
+                  "endpoint 1": true,
+                  "endpoint 2": true,
+                  "endpoint 3": true,
+                  "endpoint 4": true,
+                  "image_full_name": true,
+                  "image_registry": true,
+                  "image_remote": true,
+                  "instance": true,
+                  "instance 1": true,
+                  "instance 2": true,
+                  "instance 3": true,
+                  "instance 4": true,
+                  "job": true,
+                  "job 1": true,
+                  "job 2": true,
+                  "job 3": true,
+                  "job 4": true,
+                  "namespace": true,
+                  "namespace 1": true,
+                  "namespace 2": true,
+                  "namespace 3": true,
+                  "namespace 4": true,
+                  "pod": true,
+                  "pod 1": true,
+                  "pod 2": true,
+                  "pod 3": true,
+                  "pod 4": true,
+                  "prometheus": true,
+                  "prometheus 1": true,
+                  "prometheus 2": true,
+                  "prometheus 3": true,
+                  "prometheus 4": true,
+                  "scope": true,
+                  "scope 1": true,
+                  "scope 2": true,
+                  "scope 3": true,
+                  "score_version 1": false,
+                  "score_version 2": true,
+                  "score_version 3": true,
+                  "secured_cluster_name": true
+                },
+                "includeByName": {},
+                "indexByName": {
+                  "Time 1": 3,
+                  "Time 2": 13,
+                  "Time 3": 28,
+                  "Time 4": 31,
+                  "Time 5": 33,
+                  "Time 6": 34,
+                  "Value #A": 12,
+                  "Value #B": 27,
+                  "Value #E": 24,
+                  "Value #F": 25,
+                  "Value #G": 29,
+                  "Value #H": 32,
+                  "__name__ 1": 4,
+                  "__name__ 2": 14,
+                  "container 1": 5,
+                  "container 2": 15,
+                  "cve": 0,
+                  "endpoint 1": 6,
+                  "endpoint 2": 16,
+                  "instance 1": 7,
+                  "instance 2": 17,
+                  "is_fixable": 22,
+                  "is_suppressed": 23,
+                  "job 1": 8,
+                  "job 2": 18,
+                  "namespace 1": 9,
+                  "namespace 2": 19,
+                  "pod 1": 10,
+                  "pod 2": 20,
+                  "prometheus 1": 11,
+                  "prometheus 2": 21,
+                  "scope": 30,
+                  "score_version": 26,
+                  "severity": 1,
+                  "vulnerability_state": 2
+                },
+                "renameByName": {
+                  "Value #B": "CVSS",
+                  "Value #C": "Impact Score",
+                  "Value #D": "Env Score",
+                  "Value #E": "Affected Images",
+                  "Value #F": "Affected Workload",
+                  "cve": "CVE",
+                  "image_full_name": "",
+                  "is_fixable": "Is Fixable",
+                  "is_suppressed": "Is Suppressed",
+                  "job 1": "",
+                  "pod 4": "",
+                  "prometheus 2": "",
+                  "score_version": "Score Version",
+                  "score_version 1": "Score Version",
+                  "secured_cluster_name": "",
+                  "severity": "Severity",
+                  "vulnerability_state": "State",
+                  "vulnerability_type": "Type"
+                }
+              }
+            }
+          ],
+          "type": "table"
+        }
+      ],
+      "preload": false,
+      "schemaVersion": 41,
+      "tags": [],
+      "templating": {
+        "list": [
+          {
+            "allowCustomValue": false,
+            "current": {
+              "text": "Prometheus",
+              "value": "f313bc8b-8618-41f6-83e0-1d7a15622da4"
+            },
+            "hide": 2,
+            "name": "datasource",
+            "options": [],
+            "query": "prometheus",
+            "refresh": 1,
+            "regex": "",
+            "type": "datasource"
+          },
+          {
+            "current": {
+              "text": "my-cluster",
+              "value": "my-cluster"
+            },
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${datasource}"
+            },
+            "definition": "label_values(acs_secured_cluster_info,secured_cluster_name)",
+            "label": "Cluster",
+            "name": "cluster",
+            "options": [],
+            "query": {
+              "qryType": 1,
+              "query": "label_values(acs_secured_cluster_info,secured_cluster_name)",
+              "refId": "PrometheusVariableQueryEditor-VariableQuery"
+            },
+            "refresh": 1,
+            "regex": "",
+            "sort": 1,
+            "type": "query"
+          },
+          {
+            "allowCustomValue": false,
+            "current": {
+              "text": [
+                "IMPORTANT_VULNERABILITY_SEVERITY",
+                "CRITICAL_VULNERABILITY_SEVERITY",
+                "MODERATE_VULNERABILITY_SEVERITY",
+                "LOW_VULNERABILITY_SEVERITY",
+                "UNKNOWN_VULNERABILITY_SEVERITY"
+              ],
+              "value": [
+                "IMPORTANT_VULNERABILITY_SEVERITY",
+                "CRITICAL_VULNERABILITY_SEVERITY",
+                "MODERATE_VULNERABILITY_SEVERITY",
+                "LOW_VULNERABILITY_SEVERITY",
+                "UNKNOWN_VULNERABILITY_SEVERITY"
+              ]
+            },
+            "label": "Severity",
+            "multi": true,
+            "name": "severity",
+            "options": [
+              {
+                "selected": true,
+                "text": "CRITICAL",
+                "value": "CRITICAL_VULNERABILITY_SEVERITY"
+              },
+              {
+                "selected": true,
+                "text": "IMPORTANT",
+                "value": "IMPORTANT_VULNERABILITY_SEVERITY"
+              },
+              {
+                "selected": true,
+                "text": "MODERATE",
+                "value": "MODERATE_VULNERABILITY_SEVERITY"
+              },
+              {
+                "selected": true,
+                "text": "LOW",
+                "value": "LOW_VULNERABILITY_SEVERITY"
+              },
+              {
+                "selected": true,
+                "text": "UNKNOWN",
+                "value": "UNKNOWN_VULNERABILITY_SEVERITY"
+              }
+            ],
+            "query": "CRITICAL : CRITICAL_VULNERABILITY_SEVERITY,IMPORTANT : IMPORTANT_VULNERABILITY_SEVERITY, MODERATE : MODERATE_VULNERABILITY_SEVERITY, LOW : LOW_VULNERABILITY_SEVERITY, UNKNOWN : UNKNOWN_VULNERABILITY_SEVERITY",
+            "type": "custom"
+          },
+          {
+            "allowCustomValue": false,
+            "current": {
+              "text": "image",
+              "value": "image"
+            },
+            "hide": 2,
+            "name": "scope",
+            "options": [
+              {
+                "selected": true,
+                "text": "image",
+                "value": "image"
+              }
+            ],
+            "query": "image",
+            "type": "custom"
+          },
+          {
+            "allowCustomValue": false,
+            "current": {
+              "text": "true",
+              "value": "true"
+            },
+            "label": "Fixable",
+            "name": "fixable",
+            "options": [
+              {
+                "selected": true,
+                "text": "YES",
+                "value": "true"
+              },
+              {
+                "selected": false,
+                "text": "NO",
+                "value": "false"
+              },
+              {
+                "selected": false,
+                "text": "ANY",
+                "value": ".*"
+              }
+            ],
+            "query": "YES : true, NO : false, ANY : .*",
+            "type": "custom"
+          },
+          {
+            "allowCustomValue": false,
+            "current": {
+              "text": "false",
+              "value": "false"
+            },
+            "label": "Component Type",
+            "name": "platform_component",
+            "options": [
+              {
+                "selected": false,
+                "text": "PLATFORM",
+                "value": "true"
+              },
+              {
+                "selected": true,
+                "text": "USER WORKLOAD",
+                "value": "false"
+              },
+              {
+                "selected": false,
+                "text": "ANY",
+                "value": ".*"
+              }
+            ],
+            "query": "PLATFORM : true, USER WORKLOAD : false, ANY : .*",
+            "type": "custom"
+          }
+        ]
+      },
+      "time": {
+        "from": "now-15m",
+        "to": "now"
+      },
+      "timepicker": {},
+      "timezone": "browser",
+      "title": "Image Vulnerabilities",
+      "uid": "d61241ce-de77-45be-937c-800f7f8ca057",
+      "version": 1
+    }
