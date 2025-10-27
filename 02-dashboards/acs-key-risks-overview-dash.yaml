@@ -6,7 +6,7 @@ spec:
   folderRef: rhacs-folder
   instanceSelector:
     matchLabels:
-      dashboards: grafana
+      dashboards: grafana-acs
   json: |
     {
       "annotations": {

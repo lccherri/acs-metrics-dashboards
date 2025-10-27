@@ -7,5 +7,5 @@ spec:
   resyncPeriod: 10m0s
   instanceSelector:
     matchLabels:
-      dashboards: grafana
+      dashboards: grafana-acs
   title: RHACS Dashbords
