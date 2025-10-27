@@ -18,5 +18,5 @@ spec:
     spec:
       to:
         kind: Service
-        name: grafana-service
+        name: grafana-acs-service
         weight: 100
